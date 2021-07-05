@@ -4,7 +4,8 @@
   "description": "Repo for instagram-clone back end",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --require dotenv/config -r esm src/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "esm": "^3.2.25",
     "express": "^4.17.1",
     "mysql2": "^2.2.5",
     "sequelize": "^6.6.4"
