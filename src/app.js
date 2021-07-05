@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 
+import authRoutes from './features/auth/authRoutes';
+
 const app = express();
 
 app.use(cors());
@@ -11,8 +13,6 @@ app.use(
   })
 );
 
-app.get('/', (req, res, next) => {
-  return res.send('<h1>Hello World</h1>');
-});
+app.use(authRoutes);
 
 export default app;
