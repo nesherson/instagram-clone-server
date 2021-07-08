@@ -3,10 +3,10 @@ import constants from './constants';
 
 function start() {
   try {
-    console.log(constants);
+    console.log(`Server is running on port: ${constants.PORT}`);
     app.listen(constants.PORT);
   } catch (error) {
-    app.log.error(error);
+    console.log('Unable to start the server.');
     process.exit(1);
   }
 }
