@@ -2,9 +2,10 @@ import express from 'express';
 import cors from 'cors';
 
 import authRoutes from './features/auth/authRoutes';
+import postsRoutes from './features/post/postRoutes';
 
-import db from './db';
-import User from './features/users/usersModel';
+import Post from './features/post/postModel';
+import User from './features/user/userModel';
 
 const app = express();
 
@@ -16,6 +17,10 @@ app.use(
   })
 );
 
+Post.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Post);
+
 app.use('/auth', authRoutes);
+app.use('/post', postsRoutes);
 
 export default app;
