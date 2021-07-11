@@ -1,11 +1,17 @@
 import jwt from 'jsonwebtoken';
-import usersDAL from '../users/usersDAL';
+import userDAL from '../user/userDAL';
 
 const { JWT_SECRET } = process.env;
 
 async function signup(req, res) {
   try {
     const { email, fullname, username, password } = req.body;
+
+    const users = await userDAL.findAll({ where: { email: email } });
+
+    if (Array.isArray(users) && users.length) {
+      res.status(400).send({ msg: 'Email already exists' });
+    }
 
     const values = {
       email: email,
@@ -14,22 +20,19 @@ async function signup(req, res) {
       password: password,
       profileImg: '',
     };
-
-    const users = await usersDAL.findAll({ where: { email: email } });
-
-    if (Array.isArray(users) && users.length) {
-      res.status(400).send({ msg: 'Email already exists' });
-    }
-
-    const user = await usersDAL.create(values);
+    //TODO: hashing password
+    const user = await userDAL.create(values);
 
     const payload = { id: user.id };
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 3600000 });
+    const EXPIRES_IN = '1h';
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: EXPIRES_IN });
 
     const response = {
       user: {
         id: user.id,
         email: user.email,
+        fullname: user.fullname,
+        username: user.username,
       },
       token,
     };
@@ -44,7 +47,7 @@ async function login(req, res) {
   try {
     const { email, password } = req.body;
 
-    const users = await usersDAL.findAll({ where: { email: email } });
+    const users = await userDAL.findAll({ where: { email: email } });
 
     if (!Array.isArray(users) || !users.length) {
       res.status(400).send({ msg: 'User not found' });
@@ -52,14 +55,18 @@ async function login(req, res) {
 
     const user = users[0];
 
+    //basic password authentication
     if (password === user.password) {
       const payload = { id: user.id };
-      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 3600000 });
+      const EXPIRES_IN = '1h';
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: EXPIRES_IN });
 
       const response = {
         user: {
           id: user.id,
           email: user.email,
+          fullname: user.fullname,
+          username: user.username,
         },
         token,
       };
@@ -74,8 +81,8 @@ async function login(req, res) {
 }
 
 async function user(req, res) {
-  const users = await usersDAL.findAll({
-    where: { id: req.user.id },
+  const users = await userDAL.findAll({
+    where: { id: req.userData.id },
     attributes: { exclude: ['password'] },
   });
 
