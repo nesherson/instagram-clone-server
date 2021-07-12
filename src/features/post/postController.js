@@ -1,4 +1,5 @@
 import postDAL from './postDAL';
+import User from '../user/userModel';
 
 async function addPost(req, res) {
   try {
@@ -27,5 +28,23 @@ async function addPost(req, res) {
     res.status(400).send({ msg: err.message });
   }
 }
-export { addPost };
-export default { addPost };
+
+async function getPosts(req, res, next) {
+  try {
+    const posts = await postDAL.findAll({
+      include: [{ model: User, attributes: ['username', 'profileImg'] }],
+    });
+
+    console.log('getPosts: ', posts);
+    const response = {
+      posts: [...posts],
+      msg: 'Returned posts successfully ',
+    };
+    res.status(200).send(response);
+  } catch (err) {
+    res.status(400).send({ msg: err.message });
+  }
+}
+
+export { addPost, getPosts };
+export default { addPost, getPosts };
