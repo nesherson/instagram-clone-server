@@ -88,7 +88,17 @@ async function user(req, res) {
 
   const user = users[0];
 
-  res.send(user);
+  const response = {
+    user: {
+      id: user.id,
+      email: user.email,
+      fullname: user.fullname,
+      username: user.username,
+      profileImg: user.profileImg,
+    },
+  };
+
+  res.send(response);
 }
 
 export { signup, login, user };
