@@ -50,11 +50,12 @@ async function addComment(req, res) {
   try {
     const { commentText } = req.body;
     const postId = req.params.id;
-    console.log('commentText: ', commentText);
+    const userId = req.userData.id;
 
     const values = {
       postId: postId,
       text: commentText,
+      userId: userId,
     };
 
     const comment = await CommentDAL.create(values);
@@ -71,5 +72,46 @@ async function addComment(req, res) {
   }
 }
 
-export { addPost, getPosts, addComment };
-export default { addPost, getPosts, addComment };
+async function getComments(req, res) {
+  try {
+    const comments = await CommentDAL.findAll({
+      include: [{ model: User, attributes: ['username'] }],
+    });
+
+    const response = {
+      comments: comments,
+      msg: 'Returned comments successfully ',
+    };
+
+    res.status(200).send(response);
+  } catch (err) {
+    res.status(400).send({ msg: err.message });
+  }
+}
+
+async function likePost(req, res) {
+  try {
+    const postId = req.params.id;
+
+    const post = await postDAL.findById(postId);
+
+    post.likes += 1;
+
+    await post.save();
+
+    const response = {
+      post: {
+        id: post.id,
+        likes: post.likes,
+      },
+      msg: 'Post liked.',
+    };
+
+    res.status(200).send(response);
+  } catch (err) {
+    res.status(400).send({ msg: err.message });
+  }
+}
+
+export { addPost, getPosts, addComment, getComments, likePost };
+export default { addPost, getPosts, addComment, getComments, likePost };
