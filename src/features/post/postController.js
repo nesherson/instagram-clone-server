@@ -1,5 +1,6 @@
 import postDAL from './postDAL';
 import User from '../user/userModel';
+import CommentDAL from '../comment/commentDAL';
 
 async function addPost(req, res) {
   try {
@@ -35,7 +36,6 @@ async function getPosts(req, res, next) {
       include: [{ model: User, attributes: ['username', 'profileImg'] }],
     });
 
-    console.log('getPosts: ', posts);
     const response = {
       posts: [...posts],
       msg: 'Returned posts successfully ',
@@ -46,5 +46,30 @@ async function getPosts(req, res, next) {
   }
 }
 
-export { addPost, getPosts };
-export default { addPost, getPosts };
+async function addComment(req, res) {
+  try {
+    const { commentText } = req.body;
+    const postId = req.params.id;
+    console.log('commentText: ', commentText);
+
+    const values = {
+      postId: postId,
+      text: commentText,
+    };
+
+    const comment = await CommentDAL.create(values);
+
+    const response = {
+      id: comment.id,
+      text: comment.text,
+      postId: comment.postId,
+    };
+
+    res.status(200).send(response);
+  } catch (err) {
+    res.status(400).send({ msg: err.message });
+  }
+}
+
+export { addPost, getPosts, addComment };
+export default { addPost, getPosts, addComment };
