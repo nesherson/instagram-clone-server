@@ -6,6 +6,7 @@ import postsRoutes from './features/post/postRoutes';
 
 import Post from './features/post/postModel';
 import User from './features/user/userModel';
+import Comment from './features/comment/commentModel';
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use(
 
 Post.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Post);
+Comment.belongsTo(Post, { constraints: true, onDelete: 'CASCADE' });
+Post.hasMany(Comment);
 
 app.use('/auth', authRoutes);
 app.use('/post', postsRoutes);
