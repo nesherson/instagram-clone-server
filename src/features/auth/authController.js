@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import userDAL from '../user/userDAL';
+import postDAL from '../post/postDAL';
 
 const { JWT_SECRET } = process.env;
 
@@ -88,6 +89,8 @@ async function user(req, res) {
 
   const user = users[0];
 
+  const posts = await postDAL.findAll({ where: { userId: user.id } });
+
   const response = {
     user: {
       id: user.id,
@@ -95,6 +98,7 @@ async function user(req, res) {
       fullname: user.fullname,
       username: user.username,
       profileImg: user.profileImg,
+      posts: posts,
     },
   };
 
