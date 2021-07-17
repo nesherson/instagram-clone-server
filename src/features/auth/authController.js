@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
+import argon from 'argon2';
+
 import userDAL from '../user/userDAL';
 import postDAL from '../post/postDAL';
+import commentDAL from '../comment/commentDAL';
 
 const { JWT_SECRET } = process.env;
 
@@ -14,14 +17,15 @@ async function signup(req, res) {
       res.status(400).send({ msg: 'Email already exists' });
     }
 
+    const hash = await argon.hash(password);
+
     const values = {
       email: email,
       fullname: fullname,
       username: username,
-      password: password,
+      password: hash,
       profileImg: '',
     };
-    //TODO: hashing password
     const user = await userDAL.create(values);
 
     const payload = { id: user.id };
@@ -56,8 +60,9 @@ async function login(req, res) {
 
     const user = users[0];
 
-    //basic password authentication
-    if (password === user.password) {
+    const userVerified = await argon.verify(user.password, password)
+
+    if (userVerified) {
       const payload = { id: user.id };
       const EXPIRES_IN = '1h';
       const token = jwt.sign(payload, JWT_SECRET, { expiresIn: EXPIRES_IN });
@@ -91,6 +96,23 @@ async function user(req, res) {
 
   const posts = await postDAL.findAll({ where: { userId: user.id } });
 
+  const comments = await commentDAL.findAll();
+
+
+  const updatedPosts = posts.map((post) => {
+    const postComments = comments.filter((comment) => comment.postId === post.id);
+    return {
+      id: post.id,
+      imageUrl: post.imageUrl,
+      caption: post.caption,
+      likes: post.likes,
+      createdAt: post.createdAt,
+      userId: post.userId,
+      comments: postComments
+    };
+  });
+
+
   const response = {
     user: {
       id: user.id,
@@ -98,7 +120,7 @@ async function user(req, res) {
       fullname: user.fullname,
       username: user.username,
       profileImg: user.profileImg,
-      posts: posts,
+      posts: updatedPosts,
     },
   };
 
