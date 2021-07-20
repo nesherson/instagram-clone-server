@@ -14,8 +14,12 @@ async function create(values) {
     const savedPost = await SavedPost.findByPk(values);
     return savedPost;
   }
+
+  async function remove(values) {
+    await SavedPost.destroy(values);
+  }
   
-  export { create, findAll, findById };
+  export { create, findAll, findById, remove };
   
-  export default { create, findAll, findById };
+  export default { create, findAll, findById, remove };
   
