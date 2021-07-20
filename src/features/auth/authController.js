@@ -2,8 +2,6 @@ import jwt from 'jsonwebtoken';
 import argon from 'argon2';
 
 import userDAL from '../user/userDAL';
-import postDAL from '../post/postDAL';
-import commentDAL from '../comment/commentDAL';
 
 const { JWT_SECRET } = process.env;
 
@@ -24,7 +22,7 @@ async function signup(req, res) {
       fullname: fullname,
       username: username,
       password: hash,
-      profileImg: '',
+      profileImg: 'http://localhost:5000/images/userDefault.png',
     };
     const user = await userDAL.create(values);
 
@@ -86,46 +84,5 @@ async function login(req, res) {
   }
 }
 
-async function user(req, res) {
-  const users = await userDAL.findAll({
-    where: { id: req.userData.id },
-    attributes: { exclude: ['password'] },
-  });
-
-  const user = users[0];
-
-  const posts = await postDAL.findAll({ where: { userId: user.id } });
-
-  const comments = await commentDAL.findAll();
-
-
-  const updatedPosts = posts.map((post) => {
-    const postComments = comments.filter((comment) => comment.postId === post.id);
-    return {
-      id: post.id,
-      imageUrl: post.imageUrl,
-      caption: post.caption,
-      likes: post.likes,
-      createdAt: post.createdAt,
-      userId: post.userId,
-      comments: postComments
-    };
-  });
-
-
-  const response = {
-    user: {
-      id: user.id,
-      email: user.email,
-      fullname: user.fullname,
-      username: user.username,
-      profileImg: user.profileImg,
-      posts: updatedPosts,
-    },
-  };
-
-  res.send(response);
-}
-
-export { signup, login, user };
-export default { signup, login, user };
+export { signup, login };
+export default { signup, login };
