@@ -9,6 +9,7 @@ import userRoutes from './features/user/userRoutes';
 import Post from './features/post/postModel';
 import User from './features/user/userModel';
 import Comment from './features/comment/commentModel';
+import SavedPost from './features/savedPost/savedPostModel';
 
 const app = express();
 
@@ -27,6 +28,10 @@ Comment.belongsTo(Post, { constraints: true, onDelete: 'CASCADE' });
 Comment.belongsTo(User, { constraints: true });
 Post.hasMany(Comment);
 User.hasMany(Comment);
+SavedPost.belongsTo(User, {constraints: true, onDelete: 'CASCADE'});
+SavedPost.belongsTo(Post, {constraints: true, onDelete: 'CASCADE'});
+User.hasMany(SavedPost);
+
 
 app.use('/auth', authRoutes);
 app.use('/post', postRoutes);
