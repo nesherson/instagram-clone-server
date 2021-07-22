@@ -1,6 +1,7 @@
 import postDAL from './postDAL';
 import User from '../user/userModel';
-import CommentDAL from '../comment/commentDAL';
+import commentDAL from '../comment/commentDAL';
+import postLikeDAL from '../postLike/postLikeDAL';
 
 async function addPost(req, res) {
   try {
@@ -58,12 +59,12 @@ async function addComment(req, res) {
       userId: userId,
     };
 
-    const comment = await CommentDAL.create(values);
+    const comment = await commentDAL.create(values);
 
     const response = {
       id: comment.id,
       text: comment.text,
-      postId: comment.postId,
+        
     };
 
     res.status(200).send(response);
@@ -74,7 +75,7 @@ async function addComment(req, res) {
 
 async function getComments(req, res) {
   try {
-    const comments = await CommentDAL.findAll({
+    const comments = await commentDAL.findAll({
       include: [{ model: User, attributes: ['username'] }],
     });
 
@@ -89,22 +90,15 @@ async function getComments(req, res) {
   }
 }
 
-async function likePost(req, res) {
+async function getPostComments(req, res) {
   try {
     const postId = req.params.id;
 
-    const post = await postDAL.findById(postId);
-
-    post.likes += 1;
-
-    await post.save();
+    const comments = await commentDAL.findById(postId);
 
     const response = {
-      post: {
-        id: post.id,
-        likes: post.likes,
-      },
-      msg: 'Post liked.',
+      comments: comments,
+      msg: 'Returned post comments successfully ',
     };
 
     res.status(200).send(response);
@@ -113,5 +107,63 @@ async function likePost(req, res) {
   }
 }
 
-export { addPost, getPosts, addComment, getComments, likePost };
-export default { addPost, getPosts, addComment, getComments, likePost };
+async function likePost(req, res) {
+  try {
+    const postId = parseInt(req.params.id);
+    const userId = req.userData.id;
+    const likedPosts = await postLikeDAL.findAll({ where: {userId: userId}});
+
+    let likedPost = likedPosts.find((likedPost) => likedPost.dataValues.postId === postId);
+
+
+
+    if (!likedPost) {
+      const values = {
+        postId: postId,
+        userId: userId
+      };
+
+      likedPost = await postLikeDAL.create(values);
+
+      const response = {
+        id: likedPost.id,
+        postId: likedPost.postId,
+        userId: likedPost.userId,
+        msg: 'Post liked.'
+      };
+
+      res.status(200).send(response);
+    } else {
+      await postLikeDAL.remove({where: {
+        postId: postId,
+        userId: userId
+      }});
+
+      const response = {
+        msg: 'Post disliked'
+      };
+
+      res.status(200).send(response);
+    }
+  } catch (err) {
+    res.status(400).send({ msg: err.message });
+  }
+}
+
+async function getLikes(req, res, next) {
+  try {
+
+    const likes = await postLikeDAL.findAll();
+
+    const response = {
+      likes: likes,
+      msg: 'Returned likes successfully ',
+    };
+    res.status(200).send(response);
+  } catch (err) {
+    res.status(400).send({ msg: err.message });
+  }
+}
+
+export { addPost, getPosts, addComment, getComments, getPostComments, likePost, getLikes };
+export default { addPost, getPosts, addComment, getComments, getPostComments, likePost, getLikes };
