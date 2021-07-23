@@ -23,7 +23,7 @@ async function addPost(req, res) {
       post: {
         id: post.id,
       },
-      msg: 'Created post.',
+      msg: 'Created a post.',
     };
     res.status(200).send(response);
   } catch (err) {
@@ -39,12 +39,50 @@ async function getPosts(req, res, next) {
 
     const response = {
       posts: [...posts],
-      msg: 'Returned posts successfully ',
+      msg: 'Posts returned successfully',
     };
     res.status(200).send(response);
   } catch (err) {
     res.status(400).send({ msg: err.message });
   }
+}
+
+async function getPost(req, res, next) {
+  try {
+
+    const postId = req.params.id;
+
+    const post = await postDAL.findOne({
+      where: {id: postId},
+      include: [{ model: User, attributes: ['username', 'profileImg']}]
+    });
+
+    const comments = await commentDAL.findAll({where: {postId: postId}});
+    const likes = await postLikeDAL.findAll({where: {postId: postId}});
+
+    const updatedPost = {
+      id: post.id,
+      imageUrl: post.imageUrl,
+      caption: post.caption,
+      likes: likes,
+      comments: comments,
+      user: {
+        id: post.userId,
+        username: post.user.username,
+        profileImg: post.user.profileImg
+      }
+    };
+
+    const response = {
+      post: updatedPost,
+      msg: 'Post returned successfully.'
+    };
+
+    res.status(200).send(response);
+
+  } catch(err) {
+    res.status(400).send({msg: err.message})
+  };
 }
 
 async function addComment(req, res) {
@@ -81,7 +119,7 @@ async function getComments(req, res) {
 
     const response = {
       comments: comments,
-      msg: 'Returned comments successfully ',
+      msg: 'Comments returned successfully ',
     };
 
     res.status(200).send(response);
@@ -98,7 +136,7 @@ async function getPostComments(req, res) {
 
     const response = {
       comments: comments,
-      msg: 'Returned post comments successfully ',
+      msg: 'Post comments returned successfully ',
     };
 
     res.status(200).send(response);
@@ -157,7 +195,7 @@ async function getLikes(req, res, next) {
 
     const response = {
       likes: likes,
-      msg: 'Returned likes successfully ',
+      msg: 'Likes returned successfully.',
     };
     res.status(200).send(response);
   } catch (err) {
@@ -165,5 +203,5 @@ async function getLikes(req, res, next) {
   }
 }
 
-export { addPost, getPosts, addComment, getComments, getPostComments, likePost, getLikes };
-export default { addPost, getPosts, addComment, getComments, getPostComments, likePost, getLikes };
+export { addPost, getPosts, getPost, addComment, getComments, getPostComments, likePost, getLikes };
+export default { addPost, getPosts, getPost, addComment, getComments, getPostComments, likePost, getLikes };

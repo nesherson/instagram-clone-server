@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.post('/add-post', auth, postController.addPost);
 router.get('/posts', auth, postController.getPosts);
+router.get('/post/:id', auth, postController.getPost);
 router.post('/:id/add-comment', auth, postController.addComment);
 router.post('/:id/like', auth, postController.likePost);
 router.get('/likes', auth, postController.getLikes);
