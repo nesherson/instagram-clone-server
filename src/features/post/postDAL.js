@@ -15,6 +15,11 @@ async function findById(values) {
   return post;
 }
 
-export { create, findAll, findById };
+async function findOne(values) {
+  const post = await Post.findOne(values);
+  return post;
+}
 
-export default { create, findAll, findById };
+export { create, findAll, findById, findOne };
+
+export default { create, findAll, findById, findOne };
