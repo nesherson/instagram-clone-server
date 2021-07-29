@@ -51,6 +51,52 @@ async function getUser(req, res) {
   }
 }
 
+async function getUserByUsername(req, res) {
+  try {
+
+    const username = req.params.id;
+    
+    const user = await userDAL.findOne({
+      where: { username: username },
+      attributes: { exclude: ["password"] },
+    });
+
+    const posts = await postDAL.findAll({ where: { userId: user.id } });
+
+    const comments = await commentDAL.findAll();
+
+    const updatedPosts = posts.map((post) => {
+      const postComments = comments.filter(
+        (comment) => comment.postId === post.id
+      );
+      return {
+        id: post.id,
+        imageUrl: post.imageUrl,
+        caption: post.caption,
+        likes: post.likes,
+        createdAt: post.createdAt,
+        userId: post.userId,
+        comments: postComments,
+      };
+    });
+
+    const response = {
+      user: {
+        id: user.id,
+        email: user.email,
+        fullname: user.fullname,
+        username: user.username,
+        profileImg: user.profileImg,
+        posts: updatedPosts,
+      },
+    };
+
+    res.status(200).send(response);
+  } catch (err) {
+    res.status(400).send({ msg: err.message });
+  }
+}
+
 async function savePost(req, res) {
   try {
     const { postId } = req.body;
@@ -138,6 +184,6 @@ async function getSavedPosts(req, res) {
   }
 }
 
-export { getUser, savePost, getSavedPosts };
+export { getUser, getUserByUsername, savePost, getSavedPosts };
 
-export default { getUser, savePost, getSavedPosts };
+export default { getUser, getUserByUsername, savePost, getSavedPosts };
