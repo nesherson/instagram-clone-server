@@ -15,6 +15,11 @@ async function findById(values) {
   return user;
 }
 
-export { create, findAll, findById };
+async function findOne(values) {
+  const user = await User.findOne(values);
+  return user;
+}
 
-export default { create, findAll, findById };
+export { create, findAll, findById, findOne };
+
+export default { create, findAll, findById, findOne };
