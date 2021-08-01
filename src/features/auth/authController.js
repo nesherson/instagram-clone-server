@@ -36,6 +36,7 @@ async function signup(req, res) {
         email: user.email,
         fullname: user.fullname,
         username: user.username,
+        profileImg: user.profileImg
       },
       token,
     };
@@ -71,6 +72,7 @@ async function login(req, res) {
           email: user.email,
           fullname: user.fullname,
           username: user.username,
+          profileImg: user.profileImg
         },
         token,
       };
