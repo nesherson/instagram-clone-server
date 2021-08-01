@@ -6,7 +6,7 @@ import userDAL from "./userDAL";
 import savedPostDAL from "../savedPost/savedPostDAL";
 import postLikeDAL from "../postLike/postLikeDAL";
 
-async function getUser(req, res) {
+async function getAuthUser(req, res) {
   try {
     const users = await userDAL.findAll({
       where: { id: req.userData.id },
@@ -184,6 +184,6 @@ async function getSavedPosts(req, res) {
   }
 }
 
-export { getUser, getUserByUsername, savePost, getSavedPosts };
+export { getAuthUser, getUserByUsername, savePost, getSavedPosts };
 
-export default { getUser, getUserByUsername, savePost, getSavedPosts };
+export default { getAuthUser, getUserByUsername, savePost, getSavedPosts };
