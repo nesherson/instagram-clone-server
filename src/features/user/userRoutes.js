@@ -6,10 +6,9 @@ import userController from './userController';
 
 const router = express.Router();
 
-router.get('/authUser', auth, userController.getAuthUser);
+router.get('/auth-user', auth, userController.getAuthUser);
 router.get('/user/:id', auth, userController.getUserByUsername);
-router.post('/user/:uid/save-post', auth, userController.savePost);
-router.get('/user/:uid/saved-posts', auth, userController.getSavedPosts);
+
 
 
 
