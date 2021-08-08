@@ -33,10 +33,6 @@ async function signup(req, res) {
     const response = {
       user: {
         id: user.id,
-        email: user.email,
-        fullname: user.fullname,
-        username: user.username,
-        profileImg: user.profileImg
       },
       token,
     };
@@ -69,10 +65,6 @@ async function login(req, res) {
       const response = {
         user: {
           id: user.id,
-          email: user.email,
-          fullname: user.fullname,
-          username: user.username,
-          profileImg: user.profileImg
         },
         token,
       };
