@@ -55,7 +55,7 @@ async function login(req, res) {
 
     const user = users[0];
 
-    const userVerified = await argon.verify(user.password, password)
+    const userVerified = await argon.verify(user.password, password);
 
     if (userVerified) {
       const payload = { id: user.id };
@@ -71,7 +71,7 @@ async function login(req, res) {
 
       res.status(200).send(response);
     } else {
-      res.status(400).send({ msg: 'Invalid credentials' });
+      res.status(400).send({ error: { msg: 'Invalid credentials' } });
     }
   } catch (err) {
     res.status(400).send({ msg: err.message });

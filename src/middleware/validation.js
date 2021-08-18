@@ -1,4 +1,6 @@
-import { validationResult } from 'express-validator';
+import { validationResult, body } from 'express-validator';
+
+import userDAL from '../features/user/userDAL';
 
 function validate(validations) {
   return async (req, res, next) => {
@@ -19,4 +21,17 @@ function validate(validations) {
   };
 }
 
-export { validate };
+function isEmail() {
+  return body('email').isEmail().withMessage('Invalid email');
+}
+
+function isEmailInUse() {
+  return body('email').custom((email) => {
+    const user = userDAL.findOne({ where: { email: email } });
+    if (user) {
+      return Promise.reject('Email already in use');
+    }
+  });
+}
+
+export { validate, isEmail, isEmailInUse };
