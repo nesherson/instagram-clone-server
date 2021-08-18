@@ -39,7 +39,7 @@ async function signup(req, res) {
 
     res.status(200).send(response);
   } catch (err) {
-    res.status(400).send({ msg: err.message });
+    res.status(400).send({ error: { msg: 'Invalid credentials' } });
   }
 }
 
